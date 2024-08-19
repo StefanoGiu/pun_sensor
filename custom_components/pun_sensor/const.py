@@ -1,4 +1,35 @@
+from enum import StrEnum
 
+# Dominio HomeAssistant
+DOMAIN = "pun_sensor"
+
+# Tipi di sensore da creare
+PUN_FASCIA_MONO = 0
+PUN_FASCIA_F1 = 1
+PUN_FASCIA_F2 = 2
+PUN_FASCIA_F3 = 3
+PUN_FASCIA_F23 = 4
+
+PUN_FASCIA_MONO_MP = 5
+PUN_FASCIA_F1_MP = 6
+PUN_FASCIA_F2_MP = 7
+PUN_FASCIA_F3_MP = 8
+PUN_FASCIA_F23_MP = 9
+
+BILL_ENERGY_FIX_QUOTE = 10
+BILL_ENERGY_ENERGY_QUOTE = 11
+BILL_TRANSPORT_FIX_QUOTE = 12
+BILL_TRANSPORT_POWER_QUOTE = 13
+BILL_TRANSPORT_ENERGY_QUOTE = 14
+BILL_ASOS_ARIM_QUOTE = 15
+BILL_ACCISA_TAX = 16
+BILL_IVA = 17
+BILL_TOTAL = 18
+
+# Tipi di aggiornamento
+COORD_EVENT = "coordinator_event"
+EVENT_UPDATE_FASCIA = "event_update_fascia"
+EVENT_UPDATE_PUN = "event_update_pun"
 
 # Parametri configurabili da configuration.yaml
 CONF_SCAN_HOUR = "scan_hour"
