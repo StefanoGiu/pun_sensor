@@ -2,7 +2,6 @@ from homeassistant import config_entries
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import selector
-from homeassistant.data_entry_flow import section
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from .const import (
