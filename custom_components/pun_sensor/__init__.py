@@ -32,11 +32,36 @@ from .const import (
     PUN_FASCIA_F1,
     PUN_FASCIA_F2,
     PUN_FASCIA_F3,
+    PUN_FASCIA_MONO_MP,
+    PUN_FASCIA_F23_MP,
+    PUN_FASCIA_F1_MP,
+    PUN_FASCIA_F2_MP,
+    PUN_FASCIA_F3_MP,
+    
     CONF_SCAN_HOUR,
     CONF_ACTUAL_DATA_ONLY,
     COORD_EVENT,
     EVENT_UPDATE_FASCIA,
-    EVENT_UPDATE_PUN
+    EVENT_UPDATE_PUN,
+    CONF_FIX_QUOTA_AGGR_MEASURE,
+    CONF_MONTHLY_FEE,
+    CONF_TARIFF_TYPE,
+    CONF_NW_LOSS_PERCENTAGE,
+    TARIFF_TYPES,
+    CONF_OTHER_FEE,
+    CONF_FIX_QUOTA_TRANSPORT,
+    CONF_QUOTA_POWER,
+    CONF_POWER_IN_USE,
+    CONF_ENERGY_SC1,
+    CONF_ASOS_SC1,
+    CONF_ASOS_SC2,
+    CONF_ARIM_SC1,
+    CONF_ARIM_SC2,
+    CONF_ACCISA_TAX,
+    CONF_IVA,
+    CONF_DISCOUNT,
+    CONF_TV_TAX,
+    CONF_MONTHY_ENTITY_SENSOR,
 )
 
 import logging
@@ -112,6 +137,51 @@ async def update_listener(hass: HomeAssistant, config: ConfigEntry) -> None:
         coordinator.schedule_token = async_track_point_in_time(coordinator.hass, coordinator.update_pun, next_update_pun)
         _LOGGER.debug('Prossimo aggiornamento web: %s', next_update_pun.strftime('%d/%m/%Y %H:%M:%S %z'))
 
+    if config.options[CONF_FIX_QUOTA_AGGR_MEASURE] != coordinator.fix_quota_aggr_measure:
+        coordinator.fix_quota_aggr_measure = config.options[CONF_FIX_QUOTA_AGGR_MEASURE]
+        
+    if config.options[CONF_MONTHLY_FEE] != coordinator.monthly_fee:
+        coordinator.monthly_fee = config.options[CONF_MONTHLY_FEE]
+
+    if config.options[CONF_TARIFF_TYPE] != coordinator.tariff_type:
+        coordinator.tariff_type = config.options[CONF_TARIFF_TYPE]
+    if config.options[CONF_NW_LOSS_PERCENTAGE] != coordinator.nw_loss_percentage:
+        coordinator.nw_loss_percentage = config.options[CONF_NW_LOSS_PERCENTAGE]
+    if config.options[CONF_OTHER_FEE] != coordinator.other_fee:
+        coordinator.other_fee = config.options[CONF_OTHER_FEE]
+    if config.options[CONF_MONTHY_ENTITY_SENSOR] != coordinator.monthly_entity_sensor:
+        coordinator.monthly_entity_sensor = config.options[CONF_MONTHY_ENTITY_SENSOR]
+
+    if config.options[CONF_FIX_QUOTA_TRANSPORT] != coordinator.fix_quota_transport:
+        coordinator.fix_quota_transport = config.options[CONF_FIX_QUOTA_TRANSPORT]
+    if config.options[CONF_QUOTA_POWER] != coordinator.quota_power:
+        coordinator.quota_power = config.options[CONF_QUOTA_POWER]
+    if config.options[CONF_POWER_IN_USE] != coordinator.power_in_use:
+        coordinator.power_in_use = config.options[CONF_POWER_IN_USE]
+    if config.options[CONF_ENERGY_SC1] != coordinator.energy_sc1:
+        coordinator.energy_sc1 = config.options[CONF_ENERGY_SC1]
+
+    if config.options[CONF_ASOS_SC1] != coordinator.asos_sc1:
+        coordinator.asos_sc1 = config.options[CONF_ASOS_SC1]
+    if config.options[CONF_ASOS_SC2] != coordinator.asos_sc2:
+        coordinator.asos_sc2 = config.options[CONF_ASOS_SC2]
+    if config.options[CONF_ARIM_SC1] != coordinator.arim_sc1:
+        coordinator.arim_sc1 = config.options[CONF_ARIM_SC1]
+    if config.options[CONF_ARIM_SC2] != coordinator.arim_sc2:
+        coordinator.arim_sc2 = config.options[CONF_ARIM_SC2]
+    if config.options[CONF_ACCISA_TAX] != coordinator.accisa_tax:
+        coordinator.accisa_tax = config.options[CONF_ACCISA_TAX]
+
+    if config.options[CONF_IVA] != coordinator.iva:
+        coordinator.iva = config.options[CONF_IVA]
+    if config.options[CONF_DISCOUNT] != coordinator.discount:
+        coordinator.discount = config.options[CONF_DISCOUNT]
+    if config.options[CONF_TV_TAX] != coordinator.tv_tax:
+        coordinator.tv_tax = config.options[CONF_TV_TAX]
+
+    if config.options[CONF_MONTHY_ENTITY_SENSOR] != coordinator.monthly_entity_sensor:
+        coordinator.monthly_entity_sensor = config.options[CONF_MONTHY_ENTITY_SENSOR]
+
     if config.options[CONF_ACTUAL_DATA_ONLY] != coordinator.actual_data_only:
         # Modificata impostazione 'Usa dati reali'
         coordinator.actual_data_only = config.options[CONF_ACTUAL_DATA_ONLY]
@@ -146,12 +216,36 @@ class PUNDataUpdateCoordinator(DataUpdateCoordinator):
         # Inizializza i valori di configurazione (dalle opzioni o dalla configurazione iniziale)
         self.actual_data_only = config.options.get(CONF_ACTUAL_DATA_ONLY, config.data[CONF_ACTUAL_DATA_ONLY])
         self.scan_hour = config.options.get(CONF_SCAN_HOUR, config.data[CONF_SCAN_HOUR])
+        self.fix_quota_aggr_measure = config.options.get(CONF_FIX_QUOTA_AGGR_MEASURE, config.data[CONF_FIX_QUOTA_AGGR_MEASURE])
+        self.monthly_fee = config.options.get(CONF_MONTHLY_FEE, config.data[CONF_MONTHLY_FEE])
+        
+        self.tariff_type = config.options.get(CONF_TARIFF_TYPE, config.data[CONF_TARIFF_TYPE])
+        self.nw_loss_percentage = config.options.get(CONF_NW_LOSS_PERCENTAGE, config.data[CONF_NW_LOSS_PERCENTAGE])
+        self.other_fee = config.options.get(CONF_OTHER_FEE, config.data[CONF_OTHER_FEE])
+        self.monthly_entity_sensor = config.options.get(CONF_MONTHY_ENTITY_SENSOR, config.data[CONF_MONTHY_ENTITY_SENSOR])
+
+        self.fix_quota_transport = config.options.get(CONF_FIX_QUOTA_TRANSPORT, config.data[CONF_FIX_QUOTA_TRANSPORT])
+        self.quota_power = config.options.get(CONF_QUOTA_POWER, config.data[CONF_QUOTA_POWER])
+        self.power_in_use = config.options.get(CONF_POWER_IN_USE, config.data[CONF_POWER_IN_USE])
+        self.energy_sc1 = config.options.get(CONF_ENERGY_SC1, config.data[CONF_ENERGY_SC1])
+
+        self.asos_sc1 = config.options.get(CONF_ASOS_SC1, config.data[CONF_ASOS_SC1])
+        self.asos_sc2 = config.options.get(CONF_ASOS_SC2, config.data[CONF_ASOS_SC2])
+        self.arim_sc1 = config.options.get(CONF_ARIM_SC1, config.data[CONF_ARIM_SC1])
+        self.arim_sc2 = config.options.get(CONF_ARIM_SC2, config.data[CONF_ARIM_SC2])
+        self.accisa_tax = config.options.get(CONF_ACCISA_TAX, config.data[CONF_ACCISA_TAX])
+
+        self.iva = config.options.get(CONF_IVA, config.data[CONF_IVA])
+        self.discount = config.options.get(CONF_DISCOUNT, config.data[CONF_DISCOUNT])
+        self.tv_tax = config.options.get(CONF_TV_TAX, config.data[CONF_TV_TAX])
+
+        self.monthly_entity_sensor = config.options.get(CONF_MONTHY_ENTITY_SENSOR, config.data[CONF_MONTHY_ENTITY_SENSOR])
 
         # Inizializza i valori di default
         self.web_retries = 0
         self.schedule_token = None
-        self.pun = [0.0, 0.0, 0.0, 0.0, 0.0]
-        self.orari = [0, 0, 0, 0, 0]
+        self.pun = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        self.orari = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         self.fascia_corrente = None
         self.prossimo_cambio_fascia = None
         self.termine_prossima_fascia = None
@@ -161,7 +255,9 @@ class PUNDataUpdateCoordinator(DataUpdateCoordinator):
     async def _async_update_data(self):
         """Aggiornamento dati a intervalli prestabiliti"""
         
+        ####################################################################
         # Calcola l'intervallo di date per il mese corrente
+        ####################################################################
         date_end = dt_util.now().date()
         date_start = date(date_end.year, date_end.month, 1)
 
@@ -269,11 +365,116 @@ class PUNDataUpdateCoordinator(DataUpdateCoordinator):
                 elif fascia == 1:
                     f1.append(prezzo)
 
+
+        ####################################################################
+        # Calcola l'intervallo di date per il mese scorso
+        ####################################################################
+        date_end = dt_util.now().date().replace(day=1) - timedelta(days=1)
+        date_start = date(date_end.year, date_end.month, 1)
+
+        # Apre la pagina per generare i cookie e i campi nascosti
+        _LOGGER.debug('Connessione a URL login.')
+        async with self.session.get(LOGIN_URL) as response:
+            soup = await self.hass.async_add_executor_job(
+                partial(BeautifulSoup, await response.read(), features='html.parser')
+            )
+        
+        # Recupera i campi nascosti __VIEWSTATE e __EVENTVALIDATION per la prossima richiesta
+        viewstate = soup.find('input',{'name':'__VIEWSTATE'})['value']
+        eventvalidation = soup.find('input',{'name':'__EVENTVALIDATION'})['value']
+        login_payload = {
+            'ctl00$ContentPlaceHolder1$CBAccetto1': 'on',
+            'ctl00$ContentPlaceHolder1$CBAccetto2': 'on',
+            'ctl00$ContentPlaceHolder1$Button1': 'Accetto',
+            '__VIEWSTATE': viewstate,
+            '__EVENTVALIDATION': eventvalidation
+        }
+
+        # Effettua il login (che se corretto porta alla pagina di download XML grazie al 'ReturnUrl')
+        _LOGGER.debug('Invio credenziali a URL login.')
+        async with self.session.post(LOGIN_URL, data=login_payload) as response:
+            soup = await self.hass.async_add_executor_job(
+                partial(BeautifulSoup, await response.read(), features='html.parser')
+            )
+
+        # Recupera i campi nascosti __VIEWSTATE per la prossima richiesta
+        viewstate = soup.find('input',{'name':'__VIEWSTATE'})['value']    
+        data_request_payload = {
+            'ctl00$ContentPlaceHolder1$tbDataStart': date_start.strftime('%d/%m/%Y'),
+            'ctl00$ContentPlaceHolder1$tbDataStop': date_end.strftime('%d/%m/%Y'),
+            'ctl00$ContentPlaceHolder1$btnScarica': 'scarica+file+xml+compresso',
+            '__VIEWSTATE': viewstate
+        }
+
+        # Effettua il download dello ZIP con i file XML
+        _LOGGER.debug('Inizio download file ZIP con XML.')
+        async with self.session.post(DOWNLOAD_URL, data=data_request_payload) as response:
+            # Scompatta lo ZIP in memoria
+            try:
+                archive = zipfile.ZipFile(io.BytesIO(await response.read()))
+            except:
+                # Esce perché l'output non è uno ZIP
+                raise UpdateFailed('Archivio ZIP scaricato dal sito non valido.')
+
+        # Mostra i file nell'archivio
+        _LOGGER.debug(f'{ len(archive.namelist()) } file trovati nell\'archivio (' + ', '.join(str(fn) for fn in archive.namelist()) + ').')
+
+        # Inizializza le variabili di conteggio dei risultati
+        mono_mp = []
+        f1_mp = []
+        f2_mp = []
+        f3_mp = []
+
+        # Esamina ogni file XML nello ZIP (ordinandoli prima)
+        for fn in sorted(archive.namelist()):
+            # Scompatta il file XML in memoria
+            xml_tree = et.parse(archive.open(fn))
+
+            # Parsing dell'XML (1 file = 1 giorno)
+            xml_root = xml_tree.getroot()
+
+            # Estrae la data dal primo elemento (sarà identica per gli altri)
+            dat_string = xml_root.find('Prezzi').find('Data').text #YYYYMMDD
+
+            # Converte la stringa giorno in data
+            dat_date = date(int(dat_string[0:4]), int(dat_string[4:6]), int(dat_string[6:8]))
+
+            # Verifica la festività
+            festivo = dat_date in it_holidays
+
+            # Estrae le rimanenti informazioni
+            for prezzi in xml_root.iter('Prezzi'):
+                # Estrae l'ora dall'XML
+                ora = int(prezzi.find('Ora').text) - 1 # 1..24
+                
+                # Estrae il prezzo PUN dall'XML in un float
+                prezzo_string = prezzi.find('PUN').text
+                prezzo_string = prezzo_string.replace('.','').replace(',','.')
+                prezzo = float(prezzo_string) / 1000
+
+                # Estrae la fascia oraria
+                fascia = get_fascia_for_xml(dat_date, festivo, ora)
+
+                # Calcola le statistiche
+                mono_mp.append(prezzo)
+                if fascia == 3:
+                    f3_mp.append(prezzo)
+                elif fascia == 2:
+                    f2_mp.append(prezzo)
+                elif fascia == 1:
+                    f1_mp.append(prezzo)
+
         # Salva i risultati nel coordinator
         self.orari[PUN_FASCIA_MONO] = len(mono)
         self.orari[PUN_FASCIA_F1] = len(f1)
         self.orari[PUN_FASCIA_F2] = len(f2)
         self.orari[PUN_FASCIA_F3] = len(f3)
+
+        self.orari[PUN_FASCIA_MONO_MP] = len(mono_mp)
+        self.orari[PUN_FASCIA_F1_MP] = len(f1_mp)
+        self.orari[PUN_FASCIA_F2_MP] = len(f2_mp)
+        self.orari[PUN_FASCIA_F3_MP] = len(f3_mp)
+
         if self.orari[PUN_FASCIA_MONO] > 0:
             self.pun[PUN_FASCIA_MONO] = mean(mono)
         if self.orari[PUN_FASCIA_F1] > 0:
@@ -282,6 +483,15 @@ class PUNDataUpdateCoordinator(DataUpdateCoordinator):
             self.pun[PUN_FASCIA_F2] = mean(f2)
         if self.orari[PUN_FASCIA_F3] > 0:
             self.pun[PUN_FASCIA_F3] = mean(f3)
+
+        if self.orari[PUN_FASCIA_MONO_MP] > 0:
+            self.pun[PUN_FASCIA_MONO_MP] = mean(mono_mp)
+        if self.orari[PUN_FASCIA_F1_MP] > 0:
+            self.pun[PUN_FASCIA_F1_MP] = mean(f1_mp)
+        if self.orari[PUN_FASCIA_F2_MP] > 0:
+            self.pun[PUN_FASCIA_F2_MP] = mean(f2_mp)
+        if self.orari[PUN_FASCIA_F3_MP] > 0:
+            self.pun[PUN_FASCIA_F3_MP] = mean(f3_mp)
 
         # Calcola la fascia F23 (a partire da F2 ed F3)
         # NOTA: la motivazione del calcolo è oscura ma sembra corretta; vedere:
@@ -294,6 +504,16 @@ class PUNDataUpdateCoordinator(DataUpdateCoordinator):
             # Devono esserci dati sia per F2 che per F3 affinché il risultato sia valido
             self.orari[PUN_FASCIA_F23] = 0
             self.pun[PUN_FASCIA_F23] = 0
+
+
+        if self.orari[PUN_FASCIA_F2_MP] > 0 and self.orari[PUN_FASCIA_F3_MP] > 0:
+            # Esistono dati sia per F2 che per F3
+            self.orari[PUN_FASCIA_F23_MP] = self.orari[PUN_FASCIA_F2_MP] + self.orari[PUN_FASCIA_F3_MP]
+            self.pun[PUN_FASCIA_F23_MP] = 0.46 * self.pun[PUN_FASCIA_F2_MP] + 0.54 * self.pun[PUN_FASCIA_F3_MP]
+        else:
+            # Devono esserci dati sia per F2 che per F3 affinché il risultato sia valido
+            self.orari[PUN_FASCIA_F23_MP] = 0
+            self.pun[PUN_FASCIA_F23_MP] = 0
        
         # Logga i dati
         _LOGGER.debug('Numero di dati: ' + ', '.join(str(i) for i in self.orari))
